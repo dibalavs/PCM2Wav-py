@@ -60,9 +60,18 @@ class PCM2Wav(object):
             return chr(arg)
         return arg
 
-    def _sample_2_bin(self, sample):
+    _hex_chars = "0123456789ABCDE"
+    _hex_ff    = "FFFFFFFFFFFFFFF"
+    def _sample_2_bin(self, sample: str):
+        val = int(sample, 0)
+        sample_hex = sample.upper()
+        #If value is in hex, do it force signed
+        if (sample_hex.startswith("0X")) and val >= 0x8000:
+            tt = sample_hex.maketrans(self._hex_chars, self._hex_ff)
+            minval = sample_hex.translate(tt)
+            val = val - int(minval.replace("FX", "0x"),0) - 1
         return struct.pack(self.__formats[self.sample_width],
-                           self._chr(int(sample)))
+                           self._chr(val))
 
     def _calc_frame(self, channels_data):
         return b"".join(self._sample_2_bin(sample) for sample in channels_data)

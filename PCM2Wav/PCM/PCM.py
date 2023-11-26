@@ -22,6 +22,8 @@ class PCM(object):
                                     csv_file)
         nbr = 0
         for nbr, self.line in enumerate(self.csv):
+            if nbr == 0:
+                self.title = self.line.strip().replace('"', "")
             if nbr == first:
                 self.start_time = self.line
         self.end_time = self.line
@@ -33,9 +35,13 @@ class PCM(object):
             Calculate the sample rate
             Not supported by all kind of PCM data files!
         '''
-        self.sample_rate = self.end_time - self.start_time
+        seconds = self.end_time - self.start_time
+        self.sample_rate = seconds
         self.sample_rate /= self.sample_count
         self.sample_rate **= -1
+
+        print(f"Playback time: {seconds}")
+        print(f"Sample rate: {int(self.sample_rate)}")
 
     def pop_data(self):
         '''
